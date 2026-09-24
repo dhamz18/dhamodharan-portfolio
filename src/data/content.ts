@@ -19,7 +19,13 @@ export const skills = [
   { icon: 'Wrench', title: 'Tools', skills: ['Git', 'GitHub'] },
 ];
 
-export const timeline = [
+export const timeline: Array<{
+  type: 'edu' | 'exp';
+  year: string;
+  title: string;
+  place: string;
+  meta: string;
+}> = [
   {
     type: 'edu',
     year: '2022 – Present',

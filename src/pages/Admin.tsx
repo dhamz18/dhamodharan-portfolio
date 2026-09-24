@@ -19,7 +19,13 @@ import type { Session } from '@supabase/supabase-js';
 const defaultContent: SiteContent = {
   profile: fallbackProfile,
   skills: fallbackSkills,
-  timeline: fallbackTimeline,
+  timeline: fallbackTimeline as Array<{
+    type: 'edu' | 'exp';
+    year: string;
+    title: string;
+    place: string;
+    meta: string;
+  }>,
   projects: fallbackProjects,
   certifications: fallbackCertifications,
 };
@@ -50,14 +56,12 @@ export default function Admin() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  // Auth
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  // Load
   useEffect(() => {
     if (!session) return;
     fetchSiteContent().then((data) => {
@@ -66,7 +70,15 @@ export default function Admin() {
         merged = {
           profile: { ...defaultContent.profile!, ...(data.profile || {}) },
           skills: data.skills?.length ? data.skills : defaultContent.skills,
-          timeline: data.timeline?.length ? data.timeline : defaultContent.timeline,
+          timeline: data.timeline?.length
+            ? (data.timeline as Array<{
+                type: 'edu' | 'exp';
+                year: string;
+                title: string;
+                place: string;
+                meta: string;
+              }>)
+            : defaultContent.timeline,
           projects: data.projects?.length ? data.projects : defaultContent.projects,
           certifications: data.certifications?.length
             ? data.certifications
@@ -100,7 +112,6 @@ export default function Admin() {
     showToast('success', 'Reverted to last saved version');
   };
 
-  // Ctrl+S
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
@@ -112,7 +123,6 @@ export default function Admin() {
     return () => window.removeEventListener('keydown', onKey);
   }, [handleSave]);
 
-  // Warn on unsaved
   useEffect(() => {
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -152,7 +162,6 @@ export default function Admin() {
     setUploading(null);
   };
 
-  // ============ LOGIN ============
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6 bg-black">
@@ -199,10 +208,8 @@ export default function Admin() {
     );
   }
 
-  // ============ DASHBOARD ============
   return (
     <div className="min-h-screen bg-black p-6 md:p-10">
-      {/* Toast */}
       <AnimatePresence>
         {toast && (
           <motion.div
@@ -226,7 +233,6 @@ export default function Admin() {
       </AnimatePresence>
 
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
           <h1 className="font-royal text-3xl gradient-text">Admin Dashboard</h1>
           <div className="flex gap-3 items-center flex-wrap">
@@ -264,7 +270,6 @@ export default function Admin() {
           Tip: Press <kbd className="px-2 py-0.5 rounded bg-white/10 text-white/60">Ctrl + S</kbd> to save
         </p>
 
-        {/* Tabs */}
         <div className="flex gap-2 mb-6 flex-wrap">
           {TABS.map((t) => (
             <button
@@ -282,14 +287,12 @@ export default function Admin() {
         </div>
 
         <div className="royal-card p-6 space-y-4">
-          {/* ============ PROFILE ============ */}
           {tab === 'Profile' && content.profile && (
             <>
               <h2 className="font-royal text-xl text-yellow-400 mb-4">
                 Profile & Contact
               </h2>
 
-              {/* Profile Photo */}
               <div>
                 <label className="text-white/50 text-xs uppercase tracking-widest mb-2 block">
                   Profile Photo
@@ -301,9 +304,7 @@ export default function Admin() {
                         src={content.profile.profileImage}
                         alt="Profile"
                         className="w-full h-full object-cover"
-                        onError={(e) =>
-                          ((e.target as HTMLImageElement).style.display = 'none')
-                        }
+                        onError={(e) => ((e.target as HTMLImageElement).style.display = 'none')}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-white/30 text-xs">
@@ -332,7 +333,6 @@ export default function Admin() {
                 </div>
               </div>
 
-              {/* Resume PDF */}
               <div>
                 <label className="text-white/50 text-xs uppercase tracking-widest mb-2 block">
                   Resume PDF
@@ -373,7 +373,6 @@ export default function Admin() {
                 </div>
               </div>
 
-              {/* Fields */}
               {(
                 [
                   ['name', 'Name'],
@@ -421,7 +420,6 @@ export default function Admin() {
             </>
           )}
 
-          {/* ============ SKILLS ============ */}
           {tab === 'Skills' && content.skills && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -484,10 +482,7 @@ export default function Admin() {
                       const n = [...content.skills!];
                       n[i] = {
                         ...cat,
-                        skills: e.target.value
-                          .split(',')
-                          .map((s) => s.trim())
-                          .filter(Boolean),
+                        skills: e.target.value.split(',').map((s) => s.trim()).filter(Boolean),
                       };
                       setContent({ ...content, skills: n });
                     }}
@@ -499,7 +494,6 @@ export default function Admin() {
             </>
           )}
 
-          {/* ============ TIMELINE ============ */}
           {tab === 'Timeline' && content.timeline && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -576,7 +570,6 @@ export default function Admin() {
             </>
           )}
 
-          {/* ============ PROJECTS ============ */}
           {tab === 'Projects' && content.projects && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -678,7 +671,6 @@ export default function Admin() {
                     />
                   </div>
 
-                  {/* Project Image Upload */}
                   <div className="flex items-center gap-3">
                     {p.image && (
                       <img
@@ -711,7 +703,6 @@ export default function Admin() {
             </>
           )}
 
-          {/* ============ CERTIFICATIONS ============ */}
           {tab === 'Certifications' && content.certifications && (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -779,7 +770,6 @@ export default function Admin() {
                     />
                   </div>
 
-                  {/* Cert Image Upload */}
                   <div className="flex items-center gap-3">
                     {c.image_url && (
                       <img

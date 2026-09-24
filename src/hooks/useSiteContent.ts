@@ -11,7 +11,13 @@ import {
 const fallback: SiteContent = {
   profile: fallbackProfile,
   skills: fallbackSkills,
-  timeline: fallbackTimeline,
+  timeline: fallbackTimeline as Array<{
+    type: 'edu' | 'exp';
+    year: string;
+    title: string;
+    place: string;
+    meta: string;
+  }>,
   projects: fallbackProjects,
   certifications: fallbackCertifications.map((c) => ({
     title: c.title,
@@ -33,7 +39,15 @@ export function useSiteContent() {
           setContent({
             profile: { ...fallback.profile!, ...(data.profile || {}) },
             skills: data.skills?.length ? data.skills : fallback.skills,
-            timeline: data.timeline?.length ? data.timeline : fallback.timeline,
+            timeline: data.timeline?.length
+              ? (data.timeline as Array<{
+                  type: 'edu' | 'exp';
+                  year: string;
+                  title: string;
+                  place: string;
+                  meta: string;
+                }>)
+              : fallback.timeline,
             projects: data.projects?.length ? data.projects : fallback.projects,
             certifications: data.certifications?.length
               ? data.certifications

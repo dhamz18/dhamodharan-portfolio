@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Code2, Database, Brain, Wrench } from 'lucide-react';
+import { Code2, Database, Brain, Wrench, LucideIcon } from 'lucide-react';
 import { useSiteContent } from '../hooks/useSiteContent';
 
-const iconMap: Record<string, React.ComponentType<{ className?: string; size?: number }>> = {
+const iconMap: Record<string, LucideIcon> = {
   Code2,
   Database,
   Brain,
@@ -21,9 +21,7 @@ export default function Skills() {
         viewport={{ once: true }}
         className="text-center mb-20"
       >
-        <p className="text-red-500 tracking-[0.3em] text-sm mb-3 uppercase">
-          My Arsenal
-        </p>
+        <p className="text-red-500 tracking-[0.3em] text-sm mb-3 uppercase">My Arsenal</p>
         <h2 className="font-royal text-4xl md:text-5xl text-white">
           Skills & <span className="gradient-text">Expertise</span>
         </h2>

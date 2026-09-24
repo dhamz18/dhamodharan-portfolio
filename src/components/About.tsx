@@ -15,13 +15,14 @@ export default function About() {
   ];
 
   return (
-    <section id="about" className="relative py-32 px-6">
-      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+    <section id="about" className="relative py-16 md:py-32 px-4 md:px-6">
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 md:gap-16 items-center">
         <motion.div
-          initial={{ opacity: 0, x: -80 }}
+          initial={{ opacity: 0, x: -40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
+          className="max-w-sm md:max-w-none mx-auto w-full"
         >
           <Tilt
             tiltMaxAngleX={10}
@@ -31,8 +32,8 @@ export default function About() {
             glareMaxOpacity={0.2}
           >
             <div
-              className="relative rounded-3xl overflow-hidden border border-red-900/50"
-              style={{ boxShadow: '0 0 80px rgba(220,38,38,0.25)' }}
+              className="relative rounded-2xl md:rounded-3xl overflow-hidden border border-red-900/50"
+              style={{ boxShadow: '0 0 60px rgba(220,38,38,0.25)' }}
             >
               <img
                 src={profile.profileImage || '/profile.jpg'}
@@ -49,20 +50,23 @@ export default function About() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: 80 }}
+          initial={{ opacity: 0, x: 40 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.9 }}
+          className="text-center lg:text-left"
         >
-          <p className="text-red-500 tracking-[0.3em] text-sm mb-3 uppercase">
+          <p className="text-red-500 tracking-[0.3em] text-xs md:text-sm mb-3 uppercase">
             About Me
           </p>
-          <h2 className="font-royal text-4xl md:text-5xl text-white mb-6">
+          <h2 className="font-royal text-2xl md:text-4xl lg:text-5xl text-white mb-4 md:mb-6">
             Turning Data Into <span className="gradient-text">Intelligence</span>
           </h2>
-          <p className="text-white/60 leading-relaxed mb-8 text-lg">{profile.bio}</p>
+          <p className="text-white/60 leading-relaxed mb-6 md:mb-8 text-sm md:text-lg">
+            {profile.bio}
+          </p>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3 md:gap-4">
             {cards.map((c, i) => (
               <motion.div
                 key={c.label}
@@ -70,13 +74,15 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="royal-card p-5"
+                className="royal-card p-3 md:p-5 text-left"
               >
-                <c.icon className="text-yellow-400 mb-2" size={22} />
-                <p className="text-xs text-white/40 uppercase tracking-widest">
+                <c.icon className="text-yellow-400 mb-2" size={20} />
+                <p className="text-[10px] md:text-xs text-white/40 uppercase tracking-widest">
                   {c.label}
                 </p>
-                <p className="text-white text-sm font-medium mt-1">{c.value}</p>
+                <p className="text-white text-xs md:text-sm font-medium mt-1">
+                  {c.value}
+                </p>
               </motion.div>
             ))}
           </div>

@@ -7,7 +7,6 @@ const supabaseKey =
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// ---------- Site Content helpers ----------
 export type SiteContent = {
   profile?: {
     name: string;
@@ -65,12 +64,17 @@ export async function saveSiteContent(content: SiteContent) {
   if (error) throw error;
 }
 
-export async function uploadImage(file: File): Promise<string> {
-  const path = `${Date.now()}-${file.name}`;
+// Upload any file (image OR PDF) and return public URL
+export async function uploadFile(file: File): Promise<string> {
+  const safeName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+  const path = `${Date.now()}-${safeName}`;
   const { error } = await supabase.storage
     .from('images')
-    .upload(path, file, { upsert: true });
+    .upload(path, file, { upsert: true, cacheControl: '3600' });
   if (error) throw error;
   const { data } = supabase.storage.from('images').getPublicUrl(path);
   return data.publicUrl;
 }
+
+// Legacy alias
+export const uploadImage = uploadFile;

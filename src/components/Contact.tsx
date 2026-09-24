@@ -1,17 +1,50 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import { profile } from '../data/content';
+import { useSiteContent } from '../hooks/useSiteContent';
+
+const WEB3FORMS_KEY = '5efba59e-fe2b-421c-b9ab-4dc78c5525a2';
 
 export default function Contact() {
+  const { content } = useSiteContent();
+  const profile = content.profile!;
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
-    setTimeout(() => setSent(false), 4000);
-    setForm({ name: '', email: '', message: '' });
+    setSending(true);
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          subject: `New Portfolio Message from ${form.name}`,
+          from_name: 'Dhamodharan Portfolio',
+        }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setSent(true);
+        setTimeout(() => setSent(false), 5000);
+        setForm({ name: '', email: '', message: '' });
+      } else {
+        alert('Failed to send. Please try again.');
+      }
+    } catch {
+      alert('Network error. Please try again.');
+    }
+    setSending(false);
   };
 
   return (
@@ -27,8 +60,7 @@ export default function Contact() {
           Let's Build Something <span className="gradient-text">Meaningful</span>
         </h2>
         <p className="text-white/50 max-w-xl mx-auto">
-          Interested in working together, discussing a project, or just connecting? Drop me a
-          message.
+          Interested in working together, discussing a project, or just connecting? Drop me a message.
         </p>
       </motion.div>
 
@@ -104,9 +136,11 @@ export default function Contact() {
           </div>
           <button
             type="submit"
-            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-red-700 to-red-600 text-white font-medium hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition"
+            disabled={sending}
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-red-700 to-red-600 text-white font-medium hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] transition disabled:opacity-50"
           >
-            <Send size={16} /> {sent ? 'Message Sent!' : 'Send Message'}
+            <Send size={16} />
+            {sending ? 'Sending...' : sent ? 'Message Sent!' : 'Send Message'}
           </button>
         </motion.form>
       </div>
